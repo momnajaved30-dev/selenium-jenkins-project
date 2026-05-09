@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login – ShopWave</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
+</head>
+<body>
+<div class="admin-login-wrap">
+  <div class="admin-login-card">
+    <div class="text-center">
+      <div class="admin-logo">🛡️</div>
+      <h2>Admin Login</h2>
+      <p class="text-muted mb-4" style="font-size:.9rem">ShopWave Back Stage Panel</p>
+    </div>
+
+    {% for cat, msg in get_flashed_messages(with_categories=true) %}
+    <div class="alert alert-{{ 'success' if cat == 'success' else 'warning' if cat == 'warning' else 'danger' }} mb-3">
+      <i class="bi bi-{{ 'check-circle' if cat == 'success' else 'exclamation-triangle' if cat == 'warning' else 'x-circle' }}"></i>
+      {{ msg }}
+    </div>
+    {% endfor %}
+
+    <form action="{{ url_for('admin_login') }}" method="post" id="loginForm">
+      <div class="mb-4">
+        <label class="form-label" for="username"><i class="bi bi-person me-1"></i>Username</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="admin" required autofocus/>
+      </div>
+      <div class="mb-4">
+        <label class="form-label" for="password"><i class="bi bi-lock me-1"></i>Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-2" style="font-size:1rem">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+      </button>
+    </form>
+
+    <div class="text-center mt-4">
+      <a href="{{ url_for('index') }}" class="text-muted" style="font-size:.875rem">
+        <i class="bi bi-arrow-left me-1"></i>Back to Store
+      </a>
+    </div>
+
+    <div class="mt-4 p-3 rounded" style="background:#f7f8fc;font-size:.8rem;color:#888;text-align:center">
+      <i class="bi bi-info-circle me-1"></i>Default: <strong>admin</strong> / <strong>store123</strong>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

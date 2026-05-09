@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopWave – Premium Online Store</title>
+  <meta name="description" content="Shop the latest products at ShopWave – your modern online store."/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi bi-bag-heart-fill"></i> Shop<span>Wave</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <form class="d-flex search-form ms-auto me-3 mt-2 mt-lg-0" action="{{ url_for('index') }}" method="get">
+        <input class="form-control" type="search" name="q" placeholder="Search products…" value="{{ search }}"/>
+        <button class="btn btn-accent" type="submit"><i class="bi bi-search"></i></button>
+      </form>
+      <ul class="navbar-nav mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}"><i class="bi bi-house"></i> Home</a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('cart') }}">
+            <i class="bi bi-cart3"></i> Cart
+            {% if cart_count > 0 %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+          </a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_login') }}"><i class="bi bi-shield-lock"></i> Admin</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Flash Messages -->
+<div class="container mt-3">
+  {% for cat, msg in get_flashed_messages(with_categories=true) %}
+    {% if cat != 'order_placed' %}
+    <div class="alert alert-{{ 'success' if cat == 'success' else 'info' if cat == 'info' else 'warning' if cat == 'warning' else 'danger' }} alert-dismissible fade show" role="alert">
+      <i class="bi bi-{{ 'check-circle' if cat == 'success' else 'info-circle' if cat == 'info' else 'exclamation-triangle' if cat == 'warning' else 'x-circle' }}"></i>
+      {{ msg }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container position-relative">
+    <h1><i class="bi bi-stars"></i> Discover Amazing Products</h1>
+    <p>Shop the latest trends with fast delivery, easy returns, and unbeatable prices.</p>
+    <a href="#products" class="btn btn-hero"><i class="bi bi-arrow-down-circle me-2"></i>Shop Now</a>
+  </div>
+</section>
+
+<!-- Products -->
+<section class="page-wrapper" id="products">
+  <div class="container">
+    <div class="d-flex align-items-baseline mb-1">
+      <h2 class="section-title">
+        {% if search %}Search: "{{ search }}"{% else %}Featured Products{% endif %}
+      </h2>
+      {% if search %}
+        <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-secondary ms-3"><i class="bi bi-x"></i> Clear</a>
+      {% endif %}
+    </div>
+    <p class="section-subtitle">{{ products|length }} product{{ 's' if products|length != 1 }} found</p>
+
+    {% if products %}
+    <div class="row g-4">
+      {% for p in products %}
+      <div class="col-sm-6 col-lg-3">
+        <div class="product-card h-100">
+          <a href="{{ url_for('product_detail', product_id=p.id) }}" class="text-decoration-none text-dark">
+            <div class="img-wrap">
+              {% if p.image_url %}
+                <img src="{{ p.image_url }}" alt="{{ p.name }}" loading="lazy"/>
+              {% else %}
+                <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                  <i class="bi bi-image" style="font-size:3rem"></i>
+                </div>
+              {% endif %}
+            </div>
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="{{ url_for('product_detail', product_id=p.id) }}" class="text-decoration-none text-dark">{{ p.name }}</a>
+            </h5>
+            <p class="description text-muted">{{ p.description }}</p>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="price">${{ "%.2f"|format(p.price) }}</span>
+              {% if p.stock > 0 %}
+                <span class="badge bg-success stock-badge"><i class="bi bi-check2"></i> In Stock</span>
+              {% else %}
+                <span class="badge bg-secondary stock-badge">Out of Stock</span>
+              {% endif %}
+            </div>
+            {% if p.stock > 0 %}
+            <form action="{{ url_for('add_to_cart', product_id=p.id) }}" method="post">
+              <input type="hidden" name="quantity" value="1"/>
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-cart-plus me-1"></i> Add to Cart
+              </button>
+            </form>
+            {% else %}
+            <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="bi bi-search d-block"></i>
+      <h4>No products found</h4>
+      <p>Try a different search term or <a href="{{ url_for('index') }}">browse all products</a>.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h6><i class="bi bi-bag-heart-fill"></i> ShopWave</h6>
+        <p style="font-size:.88rem">Your one-stop destination for premium products at unbeatable prices.</p>
+      </div>
+      <div class="col-md-4">
+        <h6>Quick Links</h6>
+        <ul class="list-unstyled" style="font-size:.88rem">
+          <li><a href="{{ url_for('index') }}">Home</a></li>
+          <li><a href="{{ url_for('cart') }}">Cart</a></li>
+          <li><a href="{{ url_for('checkout') }}">Checkout</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h6>Contact</h6>
+        <p style="font-size:.88rem">
+          <i class="bi bi-envelope me-2"></i>support@shopwave.store<br/>
+          <i class="bi bi-phone me-2"></i>+1 (555) 123-4567<br/>
+          <i class="bi bi-geo-alt me-2"></i>123 Commerce St, NY
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      &copy; 2024 ShopWave. All rights reserved. Built with <i class="bi bi-heart-fill text-danger"></i> using Flask &amp; Bootstrap.
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
